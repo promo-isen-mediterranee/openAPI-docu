@@ -73,12 +73,7 @@ paths:
               $ref: '#/components/schemas/EventFormData'
       responses:
         '201':
-          description: Événement créé avec succès. Redirection vers l'événement.
-          headers:
-            Location:
-              description: Lien vers l'événement créé
-              schema:
-                type: string
+          description: Événement créé avec succès. Redirection vers l'événement
         '400':
           description: La requête est malformée ou incomplète
         '401':
@@ -131,12 +126,7 @@ paths:
               $ref: '#/components/schemas/EventFormData'
       responses:
         '201':
-          description: Événement mis à jour avec succès. Redirection vers l'événement.
-          headers:
-            Location:
-              description: Lien vers l'événement mis à jour
-              schema:
-                type: string
+          description: Événement mis à jour avec succès. Redirection vers l'événement
         '400':
           description: La requête est malformée ou incomplète
         '401':
@@ -206,12 +196,7 @@ paths:
               $ref: '#/components/schemas/StockItemFormData'
       responses:
         '201':
-          description: Item créé avec succès. Redirection vers l'item.
-          headers:
-            Location:
-              description: Lien vers l'item créé
-              schema:
-                type: string
+          description: Item créé avec succès. Redirection vers l'item
         '400':
           description: La requête est malformée ou incomplète
         '401':
@@ -264,12 +249,7 @@ paths:
               $ref: '#/components/schemas/StockItemFormData'
       responses:
         '201':
-          description: Item mis à jour avec succès. Redirection vers l'item.
-          headers:
-            Location:
-              description: Lien vers l'item mis à jour
-              schema:
-                type: string
+          description: Item mis à jour avec succès. Redirection vers l'item
         '400':
           description: La requête est malformée ou incomplète
         '401':
@@ -311,12 +291,28 @@ paths:
               $ref: '#/components/schemas/StockReserveItemFormData'
       responses:
         '201':
-          description: Item réservé avec succès. Redirection vers l'événement.
-          headers:
-            Location:
-              description: Lien vers l'événement
-              schema:
-                type: string
+          description: Réservation annulée avec succès
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+  /stock/unreserveItem:
+    post:
+      tags:
+        - stock
+      summary: Annuler la réservation d'un item pour un événement
+      description: Annule la réservation d'un item avec les détails fournis
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StockUnreserveItemFormData'
+      responses:
+        '201':
+          description: Item réservé avec succès
         '400':
           description: La requête est malformée ou incomplète
         '401':
@@ -337,12 +333,7 @@ paths:
               $ref: '#/components/schemas/AuthUserForm'
       responses:
         '201':
-          description: Utilisateur ajouté avec succès.
-          headers:
-            Location:
-              description: Lien vers la page de gestion des utilisateurs
-              schema:
-                type: string
+          description: Utilisateur ajouté avec succès
         '400':
           description: La requête est malformée ou incomplète
         '401':
@@ -371,12 +362,7 @@ paths:
               $ref: '#/components/schemas/AuthUserForm'
       responses:
         '201':
-          description: Utilisateur mis à jour avec succès.
-          headers:
-            Location:
-              description: Lien vers la page de gestion des utilisateurs
-              schema:
-                type: string
+          description: Utilisateur mis à jour avec succès
         '400':
           description: La requête est malformée ou incomplète
         '401':
@@ -446,12 +432,7 @@ paths:
               $ref: '#/components/schemas/AuthLoginForm'
       responses:
         '200':
-          description: L'utilisateur a accès à l'application.
-          headers:
-            Location:
-              description: Lien vers la page principale
-              schema:
-                type: string
+          description: L'utilisateur a accès à l'application
         '400':
           description: La requête est malformée ou incomplète
         '401':
@@ -546,6 +527,8 @@ components:
           $ref: '#/components/schemas/Event_status'
         item_manager:
           $ref: '#/components/schemas/Person'
+        location:
+          $ref: '#/components/schemas/Location'
     EventFormData:
       required:
         - name
@@ -679,6 +662,16 @@ components:
           type: integer
         status:
           type: boolean
+    StockUnreserveItemFormData:
+      required:
+        - event
+        - item
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/Event'
+        item:
+          $ref: '#/components/schemas/Item'
     Role:
       required:
         - id
