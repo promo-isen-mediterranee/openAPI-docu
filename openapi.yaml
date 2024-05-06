@@ -505,7 +505,8 @@ components:
       required:
         - id
         - name
-        - date_event
+        - date_start
+        - date_end
       type: object
       properties:
         id:
@@ -520,9 +521,12 @@ components:
         contact_objective:
           type: integer
           example: 1
-        date_event:
+        date_start:
           type: string
-          example: 24-01-2024
+          example: 24-01-2024 08:00:00
+        date_end:
+          type: string
+          example: 24-01-2024 17:00:00
         status:
           $ref: '#/components/schemas/Event_status'
         item_manager:
@@ -532,9 +536,9 @@ components:
     EventFormData:
       required:
         - name
-        - stand_size
         - item_manager
-        - date_event
+        - date_start
+        - date_end
         - location
       type: object
       properties:
@@ -544,7 +548,9 @@ components:
           type: integer
         contact_objective:
           type: integer
-        date_event:
+        date_start:
+          type: string
+        date_end:
           type: string
         status:
           $ref: '#/components/schemas/Event_statusForm'
@@ -582,7 +588,7 @@ components:
           $ref: '#/components/schemas/Event'
         set_on:
           type: string
-          example: 24-01-2024 10:34:53.44
+          example: 24-01-2024 10:34:53
         set_by:
           $ref: '#/components/schemas/User'
     Location:
