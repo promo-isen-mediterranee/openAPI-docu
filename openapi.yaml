@@ -1,0 +1,723 @@
+openapi: 3.0.3
+info:
+  title: ISEN Inventory - OpenAPI 3.0
+  description: |-
+    Ce document est la spécification OpenAPI3.0 de notre Web App. Vous trouverez dans ce document les différents points API Rest, avec leurs types de requêtes, description, paramètres et réponses possibles.
+    
+    Liens Github:
+    - [Organisation Github](https://github.com/promo-isen-mediterranee)
+    - [API Events](https://github.com/promo-isen-mediterranee/API_Event)
+    - [API Stock](https://github.com/promo-isen-mediterranee/API_Stock)
+    - [Angular](https://github.com/promo-isen-mediterranee/FrontApp)
+    - [Envoie Alertes](https://github.com/promo-isen-mediterranee/Envoi_Alertes)
+    - [Prédiction Stock (Where ???)]()
+  version: 1.0.0
+externalDocs:
+  description: Vous retrouverez toutes les resources importantes sur Notion
+  url: https://www.notion.so/atlas-snch/Projet-MASTER-Inventory-management-system-8269cc2ee2f647dba5b7b6f99929089f
+tags:
+  - name: event
+    description: Tout à propos des événements
+  - name: stock
+    description: Tout à propos du stock
+  - name: auth
+    description: Tout à propos des rôles et permissions
+paths:
+  /event/{status}:
+    get:
+      tags:
+        - event
+      summary: Récupérer tous les événements par status
+      description: Seulement une valeur de status peut être passée en paramètre
+      parameters:
+        - name: status
+          in: path
+          description: La valeur du status des événements
+          required: true
+          schema:
+            type: string
+            default: A faire
+            enum:
+              - A faire
+              - Prêt
+              - Récupéré
+              - En attente de récéption
+              - Réceptionné
+              - Fini
+      responses:
+        '200':
+          description: Renvoie les événements avec le status correspondant avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+        '400':
+          description: Le status fourni est incorrect
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '404':
+          description: Aucun événement n'a été trouvé
+  /event/create:
+    post:
+      tags:
+        - event
+      summary: Créer un nouvel événement
+      description: Crée un nouvel événement avec les détails fournis
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EventFormData'
+      responses:
+        '201':
+          description: Événement créé avec succès. Redirection vers l'événement.
+          headers:
+            Location:
+              description: Lien vers l'événement créé
+              schema:
+                type: string
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+  /event/{eventId}:
+    get:
+      tags:
+        - event
+      summary: Récupérer un événement par ID
+      description: Renvoie un événement
+      parameters:
+        - name: eventId
+          in: path
+          description: ID de l'événement à récupérer
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Renvoie l'événement correspondant avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '400':
+          description: L'ID fourni est incorrect
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '404':
+          description: L'événement n'a pas été trouvé
+    put:
+      tags:
+        - event
+      summary: Mettre à jour un événement existant
+      description: Met à jour les détails d'un événement existant avec les nouvelles valeurs fournies
+      parameters:
+        - name: eventId
+          in: path
+          description: ID de l'événement à mettre à jour
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EventFormData'
+      responses:
+        '201':
+          description: Événement mis à jour avec succès. Redirection vers l'événement.
+          headers:
+            Location:
+              description: Lien vers l'événement mis à jour
+              schema:
+                type: string
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '404':
+          description: L'événement à mettre à jour n'a pas été trouvé
+    delete:
+      tags:
+        - event
+      summary: Supprimer un événement par ID
+      description: Supprime un événement en fonction de son ID
+      parameters:
+        - name: eventId
+          in: path
+          description: ID de l'événement à supprimer
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: L'événement a été supprimé avec succès
+        '400':
+          description: L'ID fourni est incorrect
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '404':
+          description: L'événement à supprimer n'a pas été trouvé
+  /event/history/{eventId}:
+    get:
+      tags:
+        - event
+      summary: Récupérer l'historique d'un événement par ID
+      description: Renvoie l'historique d'un événement en fonction de son ID
+      parameters:
+        - name: eventId
+          in: path
+          description: L'ID de l'événement
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Renvoie l'historique d'un événement avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventHistory'
+        '400':
+          description: L'ID fourni est incorrect
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '404':
+          description: L'événement n'a pas été trouvé
+  /stock/item/create:
+    post:
+      tags:
+        - stock
+      summary: Créer un nouvel item dans le stock
+      description: Crée un nouvel item avec les détails fournis
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StockItemFormData'
+      responses:
+        '201':
+          description: Item créé avec succès. Redirection vers l'item.
+          headers:
+            Location:
+              description: Lien vers l'item créé
+              schema:
+                type: string
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+  /stock/item/{itemId}:
+    get:
+      tags:
+        - stock
+      summary: Récupérer un item par ID
+      description: Renvoie un item
+      parameters:
+        - name: itemId
+          in: path
+          description: ID de l'item à récupérer
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Renvoie l'item correspondant avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockItem'
+        '400':
+          description: L'ID fourni est incorrect
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '404':
+          description: L'événement n'a pas été trouvé
+    put:
+      tags:
+        - stock
+      summary: Mettre à jour un item existant
+      description: Met à jour les détails d'un item existant avec les nouvelles valeurs fournies
+      parameters:
+        - name: itemId
+          in: path
+          description: ID de l'item à mettre à jour
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StockItemFormData'
+      responses:
+        '201':
+          description: Item mis à jour avec succès. Redirection vers l'item.
+          headers:
+            Location:
+              description: Lien vers l'item mis à jour
+              schema:
+                type: string
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '404':
+          description: L'item à mettre à jour n'a pas été trouvé
+    delete:
+      tags:
+        - stock
+      summary: Supprimer un item par ID
+      description: Supprime un item en fonction de son ID
+      parameters:
+        - name: itemId
+          in: path
+          description: ID de l'item à supprimer
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: L'item a été supprimé avec succès
+        '400':
+          description: L'ID fourni est incorrect
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '404':
+          description: L'item à supprimer n'a pas été trouvé
+  /stock/reserveItem:
+    post:
+      tags:
+        - stock
+      summary: Réserver un item dans le stock pour un événement
+      description: Réserve un item avec les détails fournis
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StockReserveItemFormData'
+      responses:
+        '201':
+          description: Item réservé avec succès. Redirection vers l'événement.
+          headers:
+            Location:
+              description: Lien vers l'événement
+              schema:
+                type: string
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+  /auth/addUser:
+    post:
+      tags:
+        - auth
+      summary: Ajouter un utilisateur qui a accès à l'application
+      description: Ajoute un utilisateur
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuthUserForm'
+      responses:
+        '201':
+          description: Utilisateur ajouté avec succès.
+          headers:
+            Location:
+              description: Lien vers la page de gestion des utilisateurs
+              schema:
+                type: string
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+  /auth/editUser/{userId}:
+    put:
+      tags:
+        - auth
+      summary: Mettre à jour un utilisateur qui a accès à l'application
+      description: Met à jour un utilisateur
+      parameters:
+        - name: userId
+          in: path
+          description: ID de l'utilisateur à mettre à jour
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuthUserForm'
+      responses:
+        '201':
+          description: Utilisateur mis à jour avec succès.
+          headers:
+            Location:
+              description: Lien vers la page de gestion des utilisateurs
+              schema:
+                type: string
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+  /auth/getUser/{userId}:
+    get:
+      tags:
+        - auth
+      summary: Récupérer un utilisateur qui a accès à l'application
+      description: Récupère un utilisateur en base de donnée
+      parameters:
+        - name: userId
+          in: path
+          description: ID de l'utilisateur à récupérer
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Utilisateur récupéré avec succès.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRole'
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+  /auth/deleteUser/{userId}:
+    delete:
+      tags:
+        - auth
+      summary: Supprime un utilisateur
+      parameters:
+        - name: userId
+          in: path
+          description: ID de l'utilisateur à supprimer
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Utilisateur supprimé avec succès.
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+  /auth/loginUser:
+    post:
+      tags:
+        - auth
+      summary: Vérifie si un utilisateur authentifié a accès à l'application
+      description: Vérifie l'utilisateur et garde le token d'accès pour la session
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuthLoginForm'
+      responses:
+        '200':
+          description: L'utilisateur a accès à l'application.
+          headers:
+            Location:
+              description: Lien vers la page principale
+              schema:
+                type: string
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas accès
+components:
+  schemas:
+    Event_status:
+      required:
+        - id
+        - label
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        label:
+          type: string
+          example: A faire
+          enum:
+            - A faire
+            - Prêt
+            - Récupéré
+            - En attente de récéption
+            - Réceptionné
+            - Fini
+    Event_statusForm:
+      required:
+        - label
+      type: object
+      properties:
+        label:
+          type: string
+          enum:
+            - A faire
+            - Prêt
+            - Récupéré
+            - En attente de récéption
+            - Réceptionné
+            - Fini
+    Person:
+      required:
+        - id
+        - last_name
+        - first_name
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: ceba8e06-427a-4a49-80d1-f00f0edcc5e1
+        first_name:
+          type: string
+          example: John
+        last_name:
+          type: string
+          example: Doe
+    PersonForm:
+      required:
+        - last_name
+        - first_name
+      type: object
+      properties:
+        last_name:
+          type: string
+        first_name:
+          type: string
+    Event:
+      required:
+        - id
+        - name
+        - date_event
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: JPO
+        stand_size:
+          type: integer
+          example: 5
+        contact_objective:
+          type: integer
+          example: 1
+        date_event:
+          type: string
+          example: 24-01-2024
+        status:
+          $ref: '#/components/schemas/Event_status'
+        item_manager:
+          $ref: '#/components/schemas/Person'
+    EventFormData:
+      required:
+        - name
+        - stand_size
+        - item_manager
+      type: object
+      properties:
+        name:
+          type: string
+        stand_size:
+          type: integer
+        contact_objective:
+          type: integer
+        status:
+          $ref: '#/components/schemas/Event_statusForm'
+        item_manager:
+          $ref: '#/components/schemas/PersonForm'
+    User:
+      required:
+        - id
+        - email
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 2f894eb0-4df0-432b-9107-cec70ed2a3f0
+        email:
+          type: string
+          example: john.doe@isen.yncrea.fr
+    EventHistory:
+      required:
+        - id
+        - status
+        - event
+        - set_on
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        status:
+          $ref: '#/components/schemas/Event_status'
+        event:
+          $ref: '#/components/schemas/Event'
+        set_on:
+          type: string
+          example: 24-01-2024 10:34:53.44
+        set_by:
+          $ref: '#/components/schemas/User'
+    Location:
+      required:
+        - id
+        - address
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 0
+        address:
+          type: string
+          example: Place Georges Pompidou
+        city:
+          type: string
+          example: Toulon
+        room:
+          type: string
+          example: 460
+    LocationForm:
+      required:
+        - address
+      type: object
+      properties:
+        address:
+          type: string
+        city:
+          type: string
+        room:
+          type: string
+    Item:
+      required:
+        - id
+        - name
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 0
+        name:
+          type: string
+          example: Brochette ISEN
+    StockItem:
+      required:
+        - item
+        - location
+        - quantity
+      type: object
+      properties:
+        item:
+          $ref: '#/components/schemas/Item'
+        location:
+          $ref: '#/components/schemas/Location'
+        quantity:
+          type: integer
+          example: 2
+    StockItemFormData:
+      required:
+        - name
+        - quantity
+        - location
+      type: object
+      properties:
+        name:
+          type: string
+        quantity:
+          type: integer
+        location:
+          $ref: '#/components/schemas/LocationForm'
+    StockReserveItemFormData:
+      required:
+        - event
+        - item
+        - quantity
+      type: object
+      properties:
+        item:
+          $ref: '#/components/schemas/Item'
+        event:
+          $ref: '#/components/schemas/Event'
+        quantity:
+          type: integer
+        status:
+          type: boolean
+    Role:
+      required:
+        - id
+        - label
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 0
+        label:
+          type: string
+          example: ROLE_ADMIN
+    UserRole:
+      required:
+        - user
+        - role
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        role:
+          $ref: '#/components/schemas/Role'
+    AuthUserForm:
+      required:
+        - email
+        - role
+      type: object
+      properties:
+        email:
+          type: string
+        role:
+          $ref: '#/components/schemas/Role'
+    AuthLoginForm:
+      required:
+        - email
+        - clientId
+      type: object
+      properties:
+        email:
+          type: string
+        clientId:
+          type: string
