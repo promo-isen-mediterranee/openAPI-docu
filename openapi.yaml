@@ -534,6 +534,8 @@ components:
         - name
         - stand_size
         - item_manager
+        - date_event
+        - location
       type: object
       properties:
         name:
@@ -542,10 +544,14 @@ components:
           type: integer
         contact_objective:
           type: integer
+        date_event:
+          type: string
         status:
           $ref: '#/components/schemas/Event_statusForm'
         item_manager:
           $ref: '#/components/schemas/PersonForm'
+        location:
+          $ref: '#/components/schemas/LocationForm'
     User:
       required:
         - id
