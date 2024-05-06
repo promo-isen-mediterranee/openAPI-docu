@@ -536,7 +536,6 @@ components:
     EventFormData:
       required:
         - name
-        - item_manager
         - date_start
         - date_end
         - location
