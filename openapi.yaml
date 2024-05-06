@@ -418,7 +418,7 @@ paths:
           description: L'utilisateur n'est pas authentifié
         '403':
           description: L'utilisateur authentifié n'a pas les droits suffisant
-  /auth/loginUser:
+  /auth/authenticateUser:
     post:
       tags:
         - auth
@@ -718,10 +718,7 @@ components:
     AuthLoginForm:
       required:
         - email
-        - clientId
       type: object
       properties:
         email:
-          type: string
-        clientId:
           type: string
