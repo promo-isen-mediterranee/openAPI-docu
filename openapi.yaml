@@ -765,15 +765,21 @@ paths:
               $ref: '#/components/schemas/AuthLoginForm'
       responses:
         '200':
-          description: L'utilisateur a accès à l'application
+          description: L'utilisateur est connecté
+        '400':
+          description: La requête est malformée ou incomplète
+  /auth/logout:
+    post:
+      tags:
+        - auth
+      summary: Déconnecte un utilisateur
+      responses:
+        '200':
+          description: L'utilisateur est déconnecté
         '400':
           description: La requête est malformée ou incomplète
         '401':
           description: L'utilisateur n'est pas authentifié
-        '403':
-          description: L'utilisateur authentifié n'a pas accès
-  /auth/logout:
-    
 components:
   schemas:
     Event_status:
