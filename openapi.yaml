@@ -23,6 +23,26 @@ tags:
   - name: auth
     description: Tout à propos des rôles et permissions
 paths:
+  /event/getAll:
+    get:
+      tags:
+        - event
+      summary: Envoie tous les event
+      responses:
+        '200':
+          description: Events renvoyé avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
   /event/{status}:
     get:
       tags:
@@ -154,6 +174,26 @@ paths:
           description: L'utilisateur n'est pas authentifié
         '404':
           description: L'événement à supprimer n'a pas été trouvé
+  /event/location/getAll:
+    get:
+      tags:
+        - event
+      summary: Envoie toutes les location
+      responses:
+        '200':
+          description: Locations renvoyé avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Location'
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
   /event/history/{eventId}:
     get:
       tags:
@@ -203,7 +243,7 @@ paths:
           description: L'utilisateur n'est pas authentifié
         '403':
           description: L'utilisateur authentifié n'a pas les droits suffisant
-  /stock/item/{itemId}:
+  /stock/item/{itemId}/{locationId}:
     get:
       tags:
         - stock
@@ -213,6 +253,12 @@ paths:
         - name: itemId
           in: path
           description: ID de l'item à récupérer
+          required: true
+          schema:
+            type: integer
+        - name: locationId
+          in: path
+          description: L'ID de location
           required: true
           schema:
             type: integer
@@ -238,6 +284,12 @@ paths:
         - name: itemId
           in: path
           description: ID de l'item à mettre à jour
+          required: true
+          schema:
+            type: integer
+        - name: locationId
+          in: path
+          description: L'ID de location
           required: true
           schema:
             type: integer
@@ -268,6 +320,12 @@ paths:
           required: true
           schema:
             type: integer
+        - name: locationId
+          in: path
+          description: L'ID de location
+          required: true
+          schema:
+            type: integer
       responses:
         '204':
           description: L'item a été supprimé avec succès
@@ -277,6 +335,125 @@ paths:
           description: L'utilisateur n'est pas authentifié
         '404':
           description: L'item à supprimer n'a pas été trouvé
+  /stock/location/getAll:
+    get:
+      tags:
+        - stock
+      summary: Envoie toutes les location
+      responses:
+        '200':
+          description: Locations renvoyé avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Location'
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+  /stock/location/create:
+    post:
+      tags:
+        - stock
+      summary: Créé une location
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LocationForm'
+      responses:
+        '201':
+          description: Location créée avec succès
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+        '409':
+          description: La location existe déjà
+  /stock/location/{locationId}:
+    get:
+      tags:
+        - stock
+      summary: Envoie une location en fonction de l'ID
+      parameters:
+        - name: locationId
+          in: path
+          description: ID de la location
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Renvoie la location avec succès
+          content:
+            application/x-www-form-urlencoded:
+              schema:
+                $ref: '#/components/schemas/Location'
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+        '404':
+          description: La location avec l'ID fourni n'existe pas
+    put:
+      tags:
+        - stock
+      summary: Met à jour une location en fonction de l'ID
+      parameters:
+        - name: locationId
+          in: path
+          description: ID de la location
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LocationForm'
+      responses:
+        '201':
+          description: Location mise à jour avec succès
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+        '404':
+          description: La location avec l'ID fourni n'existe pas
+    delete:
+      tags:
+        - stock
+      summary: Supprime une location en fonction de l'ID
+      parameters:
+        - name: locationId
+          in: path
+          description: ID de la location
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Location supprimée avec succès
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+        '404':
+          description: La location avec l'ID fourni n'existe pas
   /stock/reserveItem:
     post:
       tags:
@@ -418,7 +595,163 @@ paths:
           description: L'utilisateur n'est pas authentifié
         '403':
           description: L'utilisateur authentifié n'a pas les droits suffisant
-  /auth/authenticateUser:
+  /auth/addRoleUser/{userId}/{roleId}:
+    post:
+      tags:
+        - auth
+      summary: Ajoute un rôle à un utilisateur.
+      parameters:
+        - name: userId
+          in: path
+          description: ID de l'utilisateur
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: roleId
+          in: path
+          description: ID du rôle
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Rôle ajouté à l'utilisateur avec succès.
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+  /auth/deleteRoleUser/{userId}/{roleId}:
+    delete:
+      tags:
+        - auth
+      summary: Enlève un rôle à un utilisateur.
+      parameters:
+        - name: userId
+          in: path
+          description: ID de l'utilisateur
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: roleId
+          in: path
+          description: ID du rôle
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Rôle enlevé à l'utilisateur avec succès.
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+  /auth/addRole/{label}:
+    post:
+      tags:
+        - auth
+      summary: Créé un rôle
+      parameters:
+        - name: label
+          in: path
+          description: Label du rôle
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Rôle créé avec succès.
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+        '409':
+          description: Rôle déjà existant
+  /auth/editRole/{roleId}:
+    put:
+      tags:
+        - auth
+      summary: Met à jour un rôle
+      parameters:
+        - name: roleId
+          in: path
+          description: L'ID du rôle
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              required:
+                - label
+              type: object
+              properties:
+                label:
+                  type: string
+      responses:
+        '201':
+          description: Rôle mis à jour avec succès.
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+        '404':
+          description: Le rôle n'éxiste pas
+  /auth/deleteRole/{roleId}:
+    delete:
+      tags:
+        - auth
+      summary: Supprime un rôle
+      parameters:
+        - name: roleId
+          in: path
+          description: L'ID du rôle
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Rôle supprimé avec succès.
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+        '404':
+          description: Le rôle n'éxiste pas
+  /auth/getRoles:
+    get:
+      tags:
+        - auth
+      summary: Envoie tous les rôles en base de donnée
+      responses:
+        '200':
+          description: Rôle envoyé avec succès.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Role'
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+  /auth/login:
     post:
       tags:
         - auth
@@ -439,6 +772,8 @@ paths:
           description: L'utilisateur n'est pas authentifié
         '403':
           description: L'utilisateur authentifié n'a pas accès
+  /auth/logout:
+    
 components:
   schemas:
     Event_status:
@@ -717,8 +1052,11 @@ components:
           $ref: '#/components/schemas/Role'
     AuthLoginForm:
       required:
-        - email
+        - username
+        - password
       type: object
       properties:
-        email:
+        username:
+          type: string
+        password:
           type: string
