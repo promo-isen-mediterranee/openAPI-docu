@@ -468,27 +468,6 @@ paths:
               $ref: '#/components/schemas/StockReserveItemFormData'
       responses:
         '201':
-          description: Réservation annulée avec succès
-        '400':
-          description: La requête est malformée ou incomplète
-        '401':
-          description: L'utilisateur n'est pas authentifié
-        '403':
-          description: L'utilisateur authentifié n'a pas les droits suffisant
-  /stock/unreserveItem:
-    post:
-      tags:
-        - stock
-      summary: Annuler la réservation d'un item pour un événement
-      description: Annule la réservation d'un item avec les détails fournis
-      requestBody:
-        required: true
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/StockUnreserveItemFormData'
-      responses:
-        '201':
           description: Item réservé avec succès
         '400':
           description: La requête est malformée ou incomplète
@@ -496,6 +475,73 @@ paths:
           description: L'utilisateur n'est pas authentifié
         '403':
           description: L'utilisateur authentifié n'a pas les droits suffisant
+        '409':
+          description: L'item est déjà réservé
+  /stock/reservedItem/edit/{eventId}/{item_locationId}:
+    put:
+      tags:
+        - stock
+      summary: Mettre à jour un item réservé
+      parameters:
+        - name: eventId
+          in: path
+          description: ID de l'événement
+          required: true
+          schema:
+            type: integer
+        - name: item_locationId
+          in: path
+          description: ID du lien entre l'item et la location
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StockReserveItemFormData'
+      responses:
+        '201':
+          description: Item réservé mis à jour avec succès
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+        '404':
+          description: L'item n'est pas réservé ou n'éxiste pas
+  /stock/unreserveItem/{eventId}/{item_locationId}:
+    delete:
+      tags:
+        - stock
+      summary: Annuler la réservation d'un item pour un événement
+      description: Annule la réservation d'un item avec les détails fournis
+      parameters:
+        - name: eventId
+          in: path
+          description: ID de l'événement
+          required: true
+          schema:
+            type: integer
+        - name: item_locationId
+          in: path
+          description: ID du lien entre l'item et la location
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Item réservé avec succès
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+        '404':
+          description: L'item n'est pas réservé ou n'éxiste pas
   /auth/addUser:
     post:
       tags:
@@ -1014,16 +1060,6 @@ components:
           type: integer
         status:
           type: boolean
-    StockUnreserveItemFormData:
-      required:
-        - eventId
-        - item_locationId
-      type: object
-      properties:
-        item_locationId:
-          type: integer
-        eventId:
-          type: integer
     Role:
       required:
         - id
