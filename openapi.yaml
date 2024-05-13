@@ -995,29 +995,29 @@ components:
           $ref: '#/components/schemas/LocationForm'
     StockReserveItemFormData:
       required:
-        - event
-        - item
+        - eventId
+        - item_locationId
         - quantity
       type: object
       properties:
-        item:
-          $ref: '#/components/schemas/Item'
-        event:
-          $ref: '#/components/schemas/Event'
+        item_locationId:
+          type: integer
+        eventId:
+          type: integer
         quantity:
           type: integer
         status:
           type: boolean
     StockUnreserveItemFormData:
       required:
-        - event
-        - item
+        - eventId
+        - item_locationId
       type: object
       properties:
-        event:
-          $ref: '#/components/schemas/Event'
-        item:
-          $ref: '#/components/schemas/Item'
+        item_locationId:
+          type: integer
+        eventId:
+          type: integer
     Role:
       required:
         - id
