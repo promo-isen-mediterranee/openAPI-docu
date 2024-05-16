@@ -243,6 +243,27 @@ paths:
           description: L'utilisateur n'est pas authentifié
         '403':
           description: L'utilisateur authentifié n'a pas les droits suffisant
+  /stock/item/getAll:
+    get:
+      tags:
+        - stock
+      summary: Récupérer tous les items
+      description: Renvoie tous les items
+      responses:
+        '200':
+          description: Renvoie tous les items avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StockItem'
+        '400':
+          description: L'ID fourni est incorrect
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '404':
+          description: L'événement n'a pas été trouvé
   /stock/item/{itemId}/{locationId}:
     get:
       tags:
@@ -454,6 +475,129 @@ paths:
           description: L'utilisateur authentifié n'a pas les droits suffisant
         '404':
           description: La location avec l'ID fourni n'existe pas
+  /stock/category/create:
+    post:
+      tags:
+        - stock
+      summary: Créé une nouvelle catégorie
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              required:
+                - label
+              type: object
+              properties:
+                label:
+                  type: string
+      responses:
+        '201':
+          description: Catégorie créée avec succès
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+        '409':
+          description: La catégorie éxiste déjà
+  /stock/category/getAll:
+    get:
+      tags:
+        - stock
+      summary: Récupère toutes les catégories
+      responses:
+        '200':
+          description: Renvoie toutes les catégories avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+  /stock/category/{categoryId}:
+    get:
+      tags:
+        - stock
+      summary: Récupère une catégorie en fonction de l'ID
+      parameters:
+        - name: categoryId
+          in: path
+          description: ID de la catégorie
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Renvoie la catégorie correspondante avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+    put:
+      tags:
+        - stock
+      summary: Met à jour une catégorie en fonction de l'ID
+      parameters:
+        - name: categoryId
+          in: path
+          description: ID de la catégorie
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              required:
+                - label
+              type: object
+              properties:
+                label:
+                  type: string
+      responses:
+        '201':
+          description: La catégorie mise à jour avec succès
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+        '404':
+          description: L'ID ne correspond à aucune catégorie
+    delete:
+      tags:
+          - stock
+      summary: Supprime une catégorie en fonction de l'ID
+      parameters:
+        - name: categoryId
+          in: path
+          description: ID de la catégorie
+          required: true
+          schema:
+            type: integer
+      responses:
+          '204':
+            description: La catégorie supprimée avec succès
+          '400':
+            description: La requête est malformée ou incomplète
+          '401':
+            description: L'utilisateur n'est pas authentifié
+          '403':
+            description: L'utilisateur authentifié n'a pas les droits suffisant
+          '404':
+            description: L'ID ne correspond à aucune catégorie
   /stock/reserveItem:
     post:
       tags:
@@ -613,6 +757,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserRole'
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+  /auth/getAllUsers:
+    get:
+      tags:
+        - auth
+      summary: Récupérer tous les utilisateur qui ont accès à l'application
+      description: Récupère tous les utilisateurs en base de donnée
+      responses:
+        '200':
+          description: Utilisateur récupéré avec succès.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserRole'
         '400':
           description: La requête est malformée ou incomplète
         '401':
@@ -1006,10 +1171,23 @@ components:
           type: string
         room:
           type: string
+    Category:
+      required:
+        - id
+        - label
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        label:
+          type: string
+          example: Règles
     Item:
       required:
         - id
         - name
+        - category
       type: object
       properties:
         id:
@@ -1018,6 +1196,8 @@ components:
         name:
           type: string
           example: Brochette ISEN
+        category:
+          $ref: '#/components/schemas/Category'
     StockItem:
       required:
         - item
@@ -1037,6 +1217,7 @@ components:
         - name
         - quantity
         - location
+        - category_label
       type: object
       properties:
         name:
@@ -1045,6 +1226,8 @@ components:
           type: integer
         location:
           $ref: '#/components/schemas/LocationForm'
+        category_label:
+          type: string
     StockReserveItemFormData:
       required:
         - eventId
