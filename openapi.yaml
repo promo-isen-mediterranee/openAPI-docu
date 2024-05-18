@@ -194,6 +194,26 @@ paths:
           description: L'utilisateur n'est pas authentifié
         '403':
           description: L'utilisateur authentifié n'a pas les droits suffisant
+  /event/status/getAll:
+    get:
+      tags:
+        - event
+      summary: Envoie tous les status possibles des événements
+      responses:
+        '200':
+          description: Status renvoyés avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event_status'
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
   /event/history/{eventId}:
     get:
       tags:
