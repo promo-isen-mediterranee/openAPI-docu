@@ -1493,7 +1493,7 @@ components:
     ReservedItem:
       type: object
       properties:
-        quantity-ret:
+        quantity_ret:
           type: integer
           example: 1
         quantity:
