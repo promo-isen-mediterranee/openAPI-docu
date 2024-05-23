@@ -242,6 +242,26 @@ paths:
           description: L'utilisateur n'est pas authentifié
         '404':
           description: L'événement n'a pas été trouvé
+  /event/person/getAll:
+    get:
+      tags:
+        - event
+      summary: Récupérer tous les résponsables de la gestion des items pour les événements
+      responses:
+        '200':
+          description: Renvoie tous les résponsables de la gestion des items pour les événements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Person'
+        '400':
+          description: L'ID fourni est incorrect
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits
   /stock/item/create:
     post:
       tags:
@@ -641,6 +661,57 @@ paths:
           description: L'utilisateur authentifié n'a pas les droits suffisant
         '409':
           description: L'item est déjà réservé
+  /stock/reservedItem/getAll/{eventId}:
+    get:
+      tags:
+        - stock
+      summary: Récupére tous les items réservés dans un événement
+      parameters:
+        - name: eventId
+          in: path
+          description: ID de l'événement
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Renvoie de tous les items réservés pour un événement
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReservedItem'
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+        '404':
+          description: L'événement est introuvable
+  /stock/reservedItem/getAll:
+    get:
+      tags:
+        - stock
+      summary: Récupére tous les items réservés
+      responses:
+        '200':
+          description: Renvoie de tous les items réservés
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReservedItem'
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+        '404':
+          description: L'événement est introuvable
   /stock/reservedItem/edit/{eventId}/{item_locationId}:
     put:
       tags:
@@ -982,6 +1053,82 @@ paths:
           description: L'utilisateur n'est pas authentifié
         '403':
           description: L'utilisateur authentifié n'a pas les droits suffisant
+  /auth/getPermissions:
+    get:
+      tags:
+        - auth
+      summary: Récupère toutes le permissions
+      responses:
+        '200':
+          description: Renvoie toutes le permissions avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Permissions'
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+  /auth/getRolePermissions/{roleId}:
+    get:
+      tags:
+        - auth
+      summary: Récupère toutes le permissions d'un rôle
+      parameters:
+        - name: roleId
+          in: path
+          description: L'ID du rôle
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Renvoie toutes le permissions du rôle avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RolePermissions'
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+  /auth/setRolePermissions/{roleId}/{permission}:
+    post:
+      tags:
+        - auth
+      summary: Définis les permissions d'un rôle
+      parameters:
+        - name: roleId
+          in: path
+          description: L'ID du rôle
+          required: true
+          schema:
+            type: integer
+        - name: permission
+          in: path
+          description: Les permissions sous forme de nombre
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Permissions du rôle définis avec succès
+        '400':
+          description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'est pas authentifié
+        '403':
+          description: L'utilisateur authentifié n'a pas les droits suffisant
+        '404':
+          description: Le rôle est introuvable
   /auth/login:
     post:
       tags:
@@ -999,6 +1146,8 @@ paths:
           description: L'utilisateur est connecté
         '400':
           description: La requête est malformée ou incomplète
+        '401':
+          description: L'utilisateur n'éxiste pas ou n'est pas autorisé à se connecter
   /auth/logout:
     post:
       tags:
@@ -1132,14 +1281,18 @@ components:
     User:
       required:
         - id
-        - email
+        - username
+        - mail
       type: object
       properties:
         id:
           type: string
           format: uuid
           example: 2f894eb0-4df0-432b-9107-cec70ed2a3f0
-        email:
+        username:
+          type: string
+          example: john.doe
+        mail:
           type: string
           example: john.doe@isen.yncrea.fr
     EventHistory:
@@ -1271,7 +1424,7 @@ components:
       properties:
         id:
           type: integer
-          example: 0
+          example: 1
         label:
           type: string
           example: ROLE_ADMIN
@@ -1287,11 +1440,14 @@ components:
           $ref: '#/components/schemas/Role'
     AuthUserForm:
       required:
-        - email
+        - username
+        - mail
         - role
       type: object
       properties:
-        email:
+        username:
+          type: string
+        mail:
           type: string
         role:
           $ref: '#/components/schemas/Role'
@@ -1305,3 +1461,53 @@ components:
           type: string
         password:
           type: string
+    Permissions:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        label:
+          type: string
+          example: Read Event
+    RolePermissions:
+      type: object
+      properties:
+        role:
+          $ref: '#/components/schemas/Role'
+        permission:
+          $ref: '#/components/schemas/Permissions'
+    ItemLocation:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        item:
+          $ref: '#/components/schemas/Item'
+        location:
+          $ref: '#/components/schemas/Location'
+        quantity:
+          type: integer
+          example: 3
+    ReservedItem:
+      type: object
+      properties:
+        quantity-ret:
+          type: integer
+          example: 1
+        quantity:
+          type: integer
+          example: 1
+        reserved_on:
+          type: string
+          example: 14-01-2024 09:32:43
+        reserved_by:
+          $ref: '#/components/schemas/User'
+        event:
+          $ref: '#/components/schemas/Event'
+        item_location:
+          $ref: '#/components/schemas/ItemLocation'
+        status:
+          type: boolean
+          example: false
