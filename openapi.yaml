@@ -1129,6 +1129,91 @@ paths:
           description: L'utilisateur authentifié n'a pas les droits suffisant
         '404':
           description: Le rôle est introuvable
+  /auth/getAllAlerts:
+    get:
+      tags:
+        - auth
+      summary: Récupère toutes les alertes
+      responses:
+        '200':
+          description: Renvoie toutes les alertes avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Alerts'
+        '400':
+          description: La requête est malformée ou incomplète
+  /auth/addAlert/{roleId}:
+    post:
+      tags:
+        - auth
+      summary: Créer une alert avec un rôle spécifique
+      parameters:
+        - name: roleId
+          in: path
+          description: L'ID du rôle
+          required: true
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: Alerte créée avec succès
+        '400':
+          description: La requête est malformée ou incomplète
+  /auth/editAlert/{alertId}:
+    put:
+      tags:
+        - auth
+      summary: Met à jour une alerte
+      parameters:
+        - name: alertId
+          in: path
+          description: L'ID de l'alerte
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              required:
+                - mail
+                - roleId
+              type: object
+              properties:
+                mail:
+                  type: string
+                roleId:
+                  type: integer
+      responses:
+        '201':
+          description: Alerte mise à jour avec succès
+        '400':
+          description: La requête est malformée ou incomplète
+        '404':
+          description: L'alerte n'a pas été trouvée
+  /auth/deleteAlert/{alertId}:
+    delete:
+      tags:
+        - auth
+      summary: Supprimer une alerte
+      parameters:
+        - name: alertId
+          in: path
+          description: L'ID de l'alerte
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Alerte supprimée avec succès
+        '400':
+          description: La requête est malformée ou incomplète
+        '404':
+          description: L'alerte n'a pas été trouvée
   /auth/login:
     post:
       tags:
@@ -1511,3 +1596,17 @@ components:
         status:
           type: boolean
           example: false
+    Alerts:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        role:
+          $ref: '#/components/schemas/Role'
+        mail:
+          type: string
+          example: john.doe@isen.yncrea.fr
+        set_on:
+          type: string
+          example: 14-01-2024 10:32:43
