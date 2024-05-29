@@ -1265,14 +1265,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  user:
-                    $ref: '#/components/schemas/User'
-                  roles:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/RolePermissionsFormatted'
+                $ref: '#/components/schemas/UserRole'
         '400':
           description: La requête est malformée ou incomplète
         '401':
@@ -1566,8 +1559,10 @@ components:
       properties:
         user:
           $ref: '#/components/schemas/User'
-        role:
-          $ref: '#/components/schemas/Role'
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/RolePermissionsFormatted'
     AuthUserForm:
       required:
         - username
