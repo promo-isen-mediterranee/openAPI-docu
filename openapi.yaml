@@ -297,7 +297,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/StockItem'
+                  $ref: '#/components/schemas/ItemLocation'
         '400':
           description: L'ID fourni est incorrect
         '401':
@@ -329,7 +329,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StockItem'
+                $ref: '#/components/schemas/ItemLocation'
         '400':
           description: L'ID fourni est incorrect
         '401':
@@ -1514,20 +1514,9 @@ components:
           example: Brochette ISEN
         category:
           $ref: '#/components/schemas/Category'
-    StockItem:
-      required:
-        - item
-        - location
-        - quantity
-      type: object
-      properties:
-        item:
-          $ref: '#/components/schemas/Item'
-        location:
-          $ref: '#/components/schemas/Location'
-        quantity:
+        gain:
           type: integer
-          example: 2
+          example: 98
     StockItemFormData:
       required:
         - name
@@ -1639,6 +1628,9 @@ components:
         quantity:
           type: integer
           example: 3
+        nb_to_order:
+          type: integer
+          example: 1
     ReservedItem:
       type: object
       properties:
