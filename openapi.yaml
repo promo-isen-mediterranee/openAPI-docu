@@ -1271,10 +1271,10 @@ paths:
                   properties:
                     user:
                       $ref: '#/components/schemas/User'
-                    role_permissions:
+                    roles:
                       type: array
                       items:
-                        $ref: '#/components/schemas/RolePermissions'
+                        $ref: '#/components/schemas/RolePermissionsFormatted'
         '400':
           description: La requête est malformée ou incomplète
         '401':
@@ -1631,6 +1631,26 @@ components:
         nb_to_order:
           type: integer
           example: 1
+    RolePermissionsFormatted:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        label:
+          type: string
+          example: ADMIN
+        permissions:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 1
+              label:
+                type: string
+                example: Read Event
     ReservedItem:
       type: object
       properties:
