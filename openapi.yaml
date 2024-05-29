@@ -1262,6 +1262,19 @@ paths:
       responses:
         '200':
           description: L'utilisateur est connecté
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    user:
+                      $ref: '#/components/schemas/User'
+                    role_permissions:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/RolePermissions'
         '400':
           description: La requête est malformée ou incomplète
         '401':
@@ -1400,7 +1413,10 @@ components:
       required:
         - id
         - username
+        - lastName
+        - firstName
         - mail
+        - is_active
       type: object
       properties:
         id:
@@ -1410,9 +1426,18 @@ components:
         username:
           type: string
           example: john.doe
+        lastName:
+          type: string
+          example: Doe
+        firstName:
+          type: string
+          example: John
         mail:
           type: string
           example: john.doe@isen.yncrea.fr
+        is_active:
+          type: boolean
+          example: true
     EventHistory:
       required:
         - id
@@ -1560,12 +1585,18 @@ components:
       required:
         - username
         - mail
+        - lastName
+        - firstName
         - role
       type: object
       properties:
         username:
           type: string
         mail:
+          type: string
+        lastName:
+          type: string
+        firstName:
           type: string
         role:
           $ref: '#/components/schemas/Role'
