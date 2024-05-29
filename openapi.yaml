@@ -1411,8 +1411,8 @@ components:
       required:
         - id
         - username
-        - lastName
-        - firstName
+        - last_name
+        - first_name
         - mail
         - is_active
       type: object
@@ -1424,10 +1424,10 @@ components:
         username:
           type: string
           example: john.doe
-        lastName:
+        last_name:
           type: string
           example: Doe
-        firstName:
+        first_name:
           type: string
           example: John
         mail:
